@@ -1,1 +1,18 @@
+# These codes is for types of defining different types of Heaps in Cpp;
+# General Formula 
+  priority_queue<Type, Container, Comparator> pq_name;
+
+# Max Heap of int type
+  priority_queue<int , vector<int> > pq;
+  
+# Min Heap of int type
+  priority_queue<int , vector<int> , greater<int>> pq;
+
+# Max Heap of pair type
+  priority_queue<pair<int , int>  , vector<pair<int , int>> > pq;
+
+# Min Heap of pair type
+  priority_queue<pair<int , int> , vector<pair<int , int>> , greater<pair<int , int>>> pq;
+
+
 
