@@ -1,0 +1,96 @@
+Bellman-Ford Algorithm
+
+The Bellman-Ford algorithm is a single-source shortest path algorithm used to find the shortest weighted distance from a starting node (source) to all other nodes in a graph.
+
+Key Advantages:
+Unlike Dijkstra's algorithm, Bellman-Ford works accurately on graphs with negative edge weights.
+It can detect the presence of negative weight cycles (a cycle whose edges sum to a negative value). 
+
+Complexity:
+Time Complexity: O(V * E) (where V is vertices and E is edges).
+Space Complexity: O(V) for the distance array.
+
+How it Works (Dynamic Programming Approach) // only for revision purpose not detiled steps
+Unlike Dijkstra (which is Greedy), Bellman-Ford uses Dynamic Programming. 
+1. We initialize the distance to the source node as 0 and all other nodes to infinity (or a very large number like 1e9).
+2. We then relax all edges exactly V-1 times. Relaxing an edge means checking if the distance to a destination node can be shortened by taking a specific edge.
+3. After V-1 iterations, the shortest paths are guaranteed to be found if there are no negative cycles.
+4. We do one final iteration (the V-th iteration) to check for negative cycles. If any distance updates during this final pass, it proves a negative cycle exists.
+
+Q: Why are we iterating exactly V-1 times? //follow up and important comceptual questions with simple and small explanation
+A simple path (a path with no cycles) in a graph with V vertices can have at most V-1 edges. By relaxing all edges V-1 times, we guarantee that shortest paths of all possible lengths (from 1 edge up to V-1 edges) are explored and calculated. Any further iterations are redundant unless a negative weight cycle exists, which would cause the distances to continuously shrink to negative infinity.
+
+Implementation (Standard)
+
+vector<int> bellman_ford(int V, vector<vector<int>>& edges, int S) {
+    // Initialize distances to infinity (1e9), and source to 0
+    vector<int> result(V, 1e9);
+    result[S] = 0;
+
+    // Relax all edges V - 1 times
+    for(int cnt = 1; cnt <= V - 1; cnt++) {
+        for(auto edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int wt = edge[2];
+
+            // If node 'u' is reachable and the path through 'u' is shorter, update 'v'
+            if(result[u] != 1e9 && result[u] + wt < result[v]) {
+                result[v] = result[u] + wt;
+            } 
+        }
+    }
+    
+    // N-th iteration to check for negative weight cycles
+    for(auto edge : edges) {
+        int u = edge[0];
+        int v = edge[1];
+        int wt = edge[2];
+
+        if(result[u] != 1e9 && result[u] + wt < result[v]) {
+            // A negative cycle is detected
+            return {-1}; 
+        } 
+    }
+
+    return result;
+}
+
+Implementation (With Path Tracking) // other imp variations of this algo or topic
+
+If we also need to reconstruct the actual shortest path from the source to any node, we can maintain a parent array. Every time we successfully relax an edge, we update the parent of the destination node.
+
+vector<int> bellman_ford_with_path(int V, vector<vector<int>>& edges, int S, vector<int>& parent) {
+    vector<int> result(V, 1e9);
+    
+    // Resize and initialize parent array to -1
+    parent.assign(V, -1); 
+    result[S] = 0;
+
+    // Relax all edges V - 1 times
+    for(int cnt = 1; cnt <= V - 1; cnt++) {
+        for(auto edge : edges) {
+            int u = edge[0];
+            int v = edge[1];
+            int wt = edge[2];
+
+            if(result[u] != 1e9 && result[u] + wt < result[v]) {
+                result[v] = result[u] + wt;
+                parent[v] = u; // Track the node we came from
+            } 
+        }
+    }
+    
+    // N-th iteration to check for negative weight cycles
+    for(auto edge : edges) {
+        int u = edge[0];
+        int v = edge[1];
+        int wt = edge[2];
+
+        if(result[u] != 1e9 && result[u] + wt < result[v]) {
+            return {-1}; // Cycle detected
+        } 
+    }
+
+    return result;
+}
