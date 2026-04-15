@@ -1,58 +1,89 @@
-# Code of Dijksta's Algorithm 
+Dijkstra's Algorithm
 
-1. Using Prority Queue:
-        vector<int> result(V , 1e9);
+Dijkstra's algorithm is a single-source shortest path algorithm used to find the shortest weighted distance from a starting node (source) to all other nodes in a graph.
 
-        priority_queue<pair<int , int> , vector<pair<int , int>> , greater<pair<int , int>> > pq;
+Key Advantages:
+It is significantly faster than Bellman-Ford for graphs with non-negative edge weights.
+Efficiently finds the shortest path using a min-heap (priority queue).
+Note: It fails and gives incorrect results on graphs with negative edge weights.
 
-        result[S] = 0;
-        pq.push({0 , S});
+Complexity:
+Time Complexity: O(E * log(V)) (where V is vertices and E is edges, using a priority queue).
+Space Complexity: O(V) for the distance array and priority queue.
 
-        while(!pq.empty()){
+How it Works (Greedy Approach) // only for revision purpose not detiled steps
+Unlike Bellman-Ford (which is Dynamic Programming), Dijkstra uses a Greedy Approach. 
+1. We initialize the distance to the source node as 0 and all other nodes to infinity (or a very large number like 1e9).
+2. We push the source node and its distance {0, source} into a min-heap (priority queue).
+3. We extract the node with the minimum distance from the heap. We then iterate through all its adjacent neighbors. 
+4. If the distance to reach the popped node plus the edge weight to the neighbor is less than the current known distance to the neighbor, we update the neighbor's distance.
+5. We push the updated {new_distance, neighbor} into the min-heap. We repeat this until the heap is empty.
 
-            int d    = pq.top().first;
-            int node = pq.top().second;
-            pq.pop();
-            if (d > result[node]) continue;
+Q: Why does Dijkstra fail on negative edge weights? //follow up and important comceptual questions with simple and small explanation
+Dijkstra assumes that once a node's minimum distance is extracted from the priority queue, it is permanently finalized and cannot be improved. If a negative weight edge exists, it might provide a cheaper path to a previously finalized node later on, breaking the greedy assumption and resulting in incorrect shortest paths.
 
-            for(auto& vec : adj[node]){
+Implementation (Standard)
 
-                int next_node = vec[0];
-                int wt        = vec[1];
+vector<int> dijkstra(int V, vector<vector<pair<int, int>>>& adj, int S) {
+    // Initialize distances to infinity (1e9), and source to 0
+    vector<int> result(V, 1e9);
+    result[S] = 0;
 
-                if(d + wt < result[next_node]){
-                    result[next_node] = d + wt;
-                    pq.push({d + wt , next_node});
-                }
+    // Min-heap to store {distance, node}
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    pq.push({0, S});
+
+    while(!pq.empty()) {
+        int dist = pq.top().first;
+        int node = pq.top().second;
+        pq.pop();
+
+        // Iterate through all adjacent nodes
+        for(auto it : adj[node]) {
+            int adjNode = it.first;
+            int wt = it.second;
+
+            // If a shorter path is found, update and push to pq
+            if(dist + wt < result[adjNode]) {
+                result[adjNode] = dist + wt;
+                pq.push({result[adjNode], adjNode});
             }
         }
-        return result;
+    }
 
-2. Using set
-        vector<int> result(V , 1e9);
+    return result;
+}
 
-        set<pair<int , int>> s;
+Implementation (With Path Tracking) // other imp variations of this algo or topic
 
-        result[S] = 0;
-        s.insert({0 , S});
+If we also need to reconstruct the actual shortest path from the source to any node, we can maintain a parent array. Every time we successfully find a shorter path to an adjacent node, we update its parent.
 
-        while(!s.empty()){
+vector<int> dijkstra_with_path(int V, vector<vector<pair<int, int>>>& adj, int S, vector<int>& parent) {
+    vector<int> result(V, 1e9);
+    
+    // Resize and initialize parent array to -1
+    parent.assign(V, -1); 
+    result[S] = 0;
 
-            int d    = s.begin()->first;
-            int node = s.begin()->second;
-            s.erase(s.begin());
-            if (d > result[node]) continue;
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    pq.push({0, S});
 
-            for(auto& vec : adj[node]){
+    while(!pq.empty()) {
+        int dist = pq.top().first;
+        int node = pq.top().second;
+        pq.pop();
 
-                int next_node = vec[0];
-                int wt        = vec[1];
+        for(auto it : adj[node]) {
+            int adjNode = it.first;
+            int wt = it.second;
 
-                if(d + wt < result[next_node]){
-                    result[next_node] = d + wt;
-                    s.insert({d + wt , next_node});
-                }
+            if(dist + wt < result[adjNode]) {
+                result[adjNode] = dist + wt;
+                parent[adjNode] = node; // Track the node we came from
+                pq.push({result[adjNode], adjNode});
             }
         }
+    }
 
-        return result;
+    return result;
+}
