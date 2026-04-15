@@ -1,0 +1,55 @@
+Floyd-Warshall Algorithm
+
+The Floyd-Warshall algorithm is an All-Pairs Shortest Path (APSP) algorithm used to find the shortest weighted distances between every pair of vertices in a directed or undirected graph.
+
+Key Advantages:
+Unlike Bellman-Ford or Dijkstra which are single-source, Floyd-Warshall calculates the shortest paths between all pairs of nodes simultaneously.
+It handles negative edge weights and can detect the presence of negative weight cycles.
+Extremely simple to implement due to its 3-nested loop structure.
+
+Complexity:
+Time Complexity: O(V^3) (where V is vertices).
+Space Complexity: O(V^2) for the 2D distance matrix.
+
+How it Works (Dynamic Programming Approach) // only for revision purpose not detiled steps
+1. We initialize a 2D distance matrix where dist[i][j] is the weight of the edge from i to j. If there is no edge, it is set to infinity (1e9). The diagonal dist[i][i] is set to 0.
+2. We use three nested loops. The outermost loop picks an intermediate vertex 'k'.
+3. The inner loops pick a source 'i' and destination 'j'. For every pair (i, j), we check if going through 'k' offers a shorter path: dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]).
+4. After all iterations, the matrix contains the shortest distances. If any diagonal element dist[i][i] becomes negative, it proves a negative weight cycle exists.
+
+Q: Why is the 'k' loop (intermediate node) the outermost loop? //follow up and important comceptual questions with simple and small explanation
+The algorithm builds solutions incrementally. In the k-th iteration, it finds the shortest path between all pairs (i, j) using only vertices from 0 to k as intermediate nodes. If 'k' were the innermost loop, we would only evaluate paths with a single specific intermediate node at a time, failing to chain paths together properly through multiple intermediate nodes.
+
+Implementation (Standard)
+
+void floyd_warshall(vector<vector<int>>& matrix) {
+    int n = matrix.size();
+    
+    // Preparation: Assuming -1 means no edge in input matrix. 
+    // Convert -1 to infinity (1e9) and diagonal to 0.
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (matrix[i][j] == -1) matrix[i][j] = 1e9;
+            if (i == j) matrix[i][j] = 0;
+        }
+    }
+
+    // Core logic: 3 nested loops
+    for (int k = 0; k < n; k++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                // If both i->k and k->j are reachable, check if this path is shorter
+                if (matrix[i][k] != 1e9 && matrix[k][j] != 1e9) {
+                    matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j]);
+                }
+            }
+        }
+    }
+    
+    // Optional: Convert 1e9 back to -1 for unreachable paths
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (matrix[i][j] == 1e9) matrix[i][j] = -1;
+        }
+    }
+}
