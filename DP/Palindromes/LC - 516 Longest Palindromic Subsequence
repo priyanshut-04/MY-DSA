@@ -1,0 +1,174 @@
+This Ques has various approaches related to DP:
+1. Recursion + Memoization (Using 2 pointers)
+2. Recursion + Memoization (Using LCS concept where 2nd string the reverse of that string)
+3. Bottom Up (Using LCS)
+4. Bottom Up (normal dp[i][j] = LPS between i and j index)
+5. Bottom Up (Using BluePrint)
+
+1:
+class Solution {
+    int[][] t;
+    private int solve(int i , int j , String s){
+        if(i == j) return 1;
+
+        if(i > j) return 0;
+
+        if(t[i][j] != -1) return t[i][j];
+
+        if(s.charAt(i) == s.charAt(j)){
+            return t[i][j] = 2 + solve(i+1 , j-1 , s);
+        }
+
+        int take_i = solve(i , j-1 , s);
+
+        int take_j = solve(i+1 , j , s);
+
+
+        return t[i][j] = Math.max(take_i , take_j);
+    }
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+
+        t = new int[n][n];
+        for(int i = 0; i<n; i++){
+            Arrays.fill(t[i] , -1);
+        }
+
+        return solve(0 , n-1 , s);
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (Memoization Array) , Stack Memory (Recursion): O(n)
+
+2: 
+class Solution {
+    int[][] t;
+    private int solve(int i , int j , String s , String r){
+        if(i == s.length() || j == r.length()){
+            return 0;
+        }
+
+        if(t[i][j] != -1) return t[i][j];
+
+        if(s.charAt(i) == r.charAt(j)){
+            return t[i][j] = 1 + solve(i+1 , j+1 , s , r);
+        }
+
+        int take_s = solve(i+1 , j , s , r);
+        int take_r = solve(i , j+1 , s, r);
+
+        return t[i][j] = Math.max(take_s , take_r); 
+    }
+    public int longestPalindromeSubseq(String s) {
+        String rev = "";
+        for(int i = s.length()-1; i>=0; i--){
+            rev += s.charAt(i);
+        }
+        int n = s.length();
+
+        t = new int[n][n];
+        for(int i = 0; i<n; i++){
+            Arrays.fill(t[i] , -1);
+        }
+
+        return solve(0 , 0 , s , rev);
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (Memoization Array) , Stack Memory (Recursion): $O(n)$ , Extra Variables: $O(n)$
+
+3:
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+
+        String rev = "";
+        for(int i = n-1; i>=0; i--){
+            rev += s.charAt(i);
+        }
+        
+        int[][] dp = new int[n+1][n+1];
+
+        //dp[i][j] = LCS of string1 and string2 of length i and j respectively
+
+        for(int i = 0; i<=n; i++){
+            for(int j = 0; j<=n; j++){
+                if(i == 0 || j == 0){
+                    dp[i][j] = 0;
+                }
+                //i and j are length and we need access.
+                else if(s.charAt(i-1) == rev.charAt(j-1)){
+                    dp[i][j] = 1 + dp[i-1][j-1];
+                }
+                else{
+                    dp[i][j] = Math.max(dp[i-1][j] , dp[i][j-1]);
+                }
+            }
+        }
+
+
+        return dp[n][n];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (DP Table Array) , Extra Variables: $O(n)$
+
+4:
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+
+        int[][] dp = new int [n][n];
+
+        for(int i = n-1; i>=0; i--){
+            dp[i][i] = 1;
+            for(int j = i+1; j<n; j++){
+                if(s.charAt(i) == s.charAt(j)){
+                    dp[i][j] = 2 + dp[i+1][j-1];
+                }
+                else{
+                    dp[i][j] = Math.max(dp[i+1][j] , dp[i][j-1]);
+                }
+            }
+        }
+
+        return dp[0][n-1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (DP Table Array)
+
+5:
+class Solution {
+    public int longestPalindromeSubseq(String s) {
+        int n = s.length();
+
+        int[][] dp = new int[n][n];
+
+        for(int i = 0; i<n; i++){
+            dp[i][i] = 1;
+        }
+
+        for(int L = 2; L<=n; L++){
+            for(int i = 0; i+L-1<n; i++){
+                int j = i+L-1;
+
+                if(s.charAt(i) == s.charAt(j)){
+                    dp[i][j] = 2 + dp[i+1][j-1];
+                }
+                else{
+                    dp[i][j] = Math.max(dp[i][j-1] , dp[i+1][j]);
+                }
+            }
+        }
+
+        return dp[0][n-1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (DP Table Array)
