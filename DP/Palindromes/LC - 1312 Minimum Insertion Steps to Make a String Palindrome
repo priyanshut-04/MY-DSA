@@ -1,0 +1,113 @@
+This Ques has various approaches:
+1. Recursion + Memoization (Using 2 pointers)
+2. Bottom Up (Normal)
+3. Bottom Up (Using BluePrint)
+4. Using LPS (longest Palindrmic Subsequence => Min Insertion = Total Length - LPS) code not available.
+5. Bottom Up (Space Optimization)
+
+1:
+class Solution {
+    public int minInsertions(String s) {
+        int n = s.length();
+        int[] dp = new int[n];
+
+        for (int i = n - 2; i >= 0; i--) {
+            int prev = 0; // holds dp[i+1][j-1]
+            for (int j = i + 1; j < n; j++) {
+                int temp = dp[j]; // save before overwrite (becomes next prev)
+                if (s.charAt(i) == s.charAt(j)) {
+                    dp[j] = prev;
+                } else {
+                    dp[j] = 1 + Math.min(dp[j], dp[j - 1]);
+                }
+                prev = temp;
+            }
+        }
+
+        return dp[n - 1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (Memoization Array) , Stack Memory (Recursion): O(n)
+
+2:
+class Solution {
+    public int minInsertions(String s) {
+        int n = s.length();
+
+        int[][] dp = new int[n][n];
+
+        for(int i = n-1; i>=0; i--){
+            for(int j = i+1; j<n; j++){
+
+                if(s.charAt(i) == s.charAt(j)){
+                    dp[i][j] = dp[i+1][j-1];
+                }
+                else{
+                    dp[i][j] = 1 + Math.min(dp[i+1][j] , dp[i][j-1]);
+                }
+            }
+        }
+
+        return dp[0][n-1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (DP Table Array
+
+3:
+class Solution {
+    public int minInsertions(String s) {
+        int n = s.length();
+
+        int[][] dp = new int[n][n];
+
+        for(int L = 1; L<=n; L++){
+            for(int i = 0; i+L-1<n; i++){
+                int j = i+L-1;
+
+                if(i == j) continue;
+
+                else if(s.charAt(i) == s.charAt(j)){
+                    dp[i][j] = dp[i+1][j-1];
+                }
+                else{
+                    dp[i][j] = 1 + Math.min(dp[i+1][j] , dp[i][j-1]);
+                }
+            }
+        }
+
+        return dp[0][n-1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) (DP Table Array)
+
+5:
+class Solution {
+    public int minInsertions(String s) {
+        int n = s.length();
+        int[] dp = new int[n];
+
+        for (int i = n - 2; i >= 0; i--) {
+            int prev = 0; // holds dp[i+1][j-1]
+            for (int j = i + 1; j < n; j++) {
+                int temp = dp[j]; // save before overwrite (becomes next prev)
+                if (s.charAt(i) == s.charAt(j)) {
+                    dp[j] = prev;
+                } else {
+                    dp[j] = 1 + Math.min(dp[j], dp[j - 1]);
+                }
+                prev = temp;
+            }
+        }
+
+        return dp[n - 1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n) (1D DP Array) , Extra Variables: O(1)
