@@ -1,0 +1,49 @@
+Very Imp Ques for Sliding Window must do dry Rum
+
+class Solution {
+    public String minWindow(String s, String t) {
+        int n = s.length();
+        int m = t.length();
+
+        Map<Character, Integer> map = new HashMap<>();
+        for (int i = 0; i < m; i++) {
+            char c = t.charAt(i);
+            map.put(c, map.getOrDefault(c, 0) + 1);
+        }
+
+        int i = 0, j = 0;
+        int startIndex = -1;
+        int minLen = Integer.MAX_VALUE;
+        int countReq = m;
+
+        while (j < n) {
+            char c = s.charAt(j);
+            if (map.getOrDefault(c, 0) > 0) {
+                countReq--;
+            }
+            map.put(c, map.getOrDefault(c, 0) - 1);
+
+            while (countReq == 0) {
+                if (j - i + 1 < minLen) {
+                    startIndex = i;
+                    minLen = j - i + 1;
+                }
+
+                char leftChar = s.charAt(i);
+                map.put(leftChar, map.getOrDefault(leftChar, 0) + 1);
+                if (map.get(leftChar) > 0) {
+                    countReq++;
+                }
+                i++;
+            }
+            j++;
+        }
+
+        if (startIndex == -1) return "";
+
+        return s.substring(startIndex, startIndex + minLen);
+    }
+}
+
+T.C. -> O(m+n)
+S.C. -> O(m+n)
