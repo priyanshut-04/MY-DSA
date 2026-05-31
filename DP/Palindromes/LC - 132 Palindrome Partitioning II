@@ -1,0 +1,90 @@
+This is a very Special ad imp Ques much dry run and understand its bottom up part
+
+1:
+class Solution {
+    int[][] t;
+    private boolean palindrome(int i , int j , String s){
+        while(i < j){
+            if(s.charAt(i) != s.charAt(j)) return false;
+            i++;
+            j--;
+        }
+
+        return true;
+    }
+    private int solve(int i , int j , String s){
+        if(i >= j) return 0;
+
+        if(t[i][j] != -1) return t[i][j];
+
+        if(palindrome(i , j , s)) return 0; //O(n)
+
+        int res = Integer.MAX_VALUE;
+        for(int k = i; k<j; k++){ //O(n)
+            int temp = 1 + solve(i , k , s) + solve(k+1 , j , s);
+
+            res = Math.min(temp , res);
+        }
+
+        return t[i][j] = res;
+    }
+    public int minCut(String s) {
+        int n = s.length();
+        t = new int[n][n]; //O(n^2 * (2n)) = O(n^3)
+
+        for(int i = 0; i<n; i++){
+            Arrays.fill(t[i] , -1);
+        }
+        return solve(0 , n-1 , s);
+    }
+}
+
+T.C. -> O(n^3) or O(n^2 * (n+n))
+S.C. -> O(n^2) memoization , O(n) Recursion Stack
+
+2:
+class Solution {
+    public int minCut(String s) {
+        int n = s.length();
+
+        boolean[][] t = new boolean[n][n];
+
+        for(int L = 1; L <= n; L++){
+            for(int i = 0; i+L-1<n; i++){
+                int j = i+L-1;
+
+                if(L == 1) {
+                    t[i][j] = true;
+                }
+                else if(L == 2 && s.charAt(i) == s.charAt(j)){
+                    t[i][j] = true;
+                } 
+                else if(s.charAt(i) == s.charAt(j) && t[i+1][j-1]){
+                    t[i][j] = true;
+                }
+            }
+        }
+
+        int[] dp = new int[n]; // min cuts required to split this string in palindromes
+        Arrays.fill(dp , Integer.MAX_VALUE);
+        for(int i = 0; i<n; i++){
+            if(t[0][i] == true){
+                dp[i] = 0;
+            }
+            else{
+                //check if k+1 is palindrome or not 
+                //we are only apply cut if we found palindrome
+                for(int k = 0; k<i; k++){
+                    if(t[k+1][i] && 1+dp[k] < dp[i]){
+                        dp[i] = 1+dp[k];
+                    }
+                }
+            }
+        }
+
+        return dp[n-1];
+    }
+}
+
+T.C. -> O(n^2)
+S.C. -> O(n^2) + O(n)
