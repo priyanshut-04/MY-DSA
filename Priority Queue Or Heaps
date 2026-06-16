@@ -6,13 +6,35 @@
   priority_queue<int , vector<int> > pq;
   
 # Min Heap of int type
-  priority_queue<int , vector<int> , greater<int>> pq;
+  priority_queue<int , vector<int> , greater<int>> pq; //default is max Heap
 
 # Max Heap of pair type
-  priority_queue<pair<int , int>  , vector<pair<int , int>> > pq;
+  priority_queue<pair<int , int> pq_name , vector<pair<int , int>> > pq;
 
 # Min Heap of pair type
   priority_queue<pair<int , int> , vector<pair<int , int>> , greater<pair<int , int>>> pq;
+
+# Codes for defining Heaps in Java
+# General Formula
+  PriorityQueue<Type> pq = new PriorityQueue<>(Comparator);
+
+# Min Heap of Integer Type
+  PriorityQueue<Integer> pq = new PriorityQueue<>(); //default is min Heap
+
+# Max Heap of Integer Type
+  PriorityQueue<Integer> pq = new PriorityQueue<>(Collections.reverseOrder());
+
+# Max Heap of Array/Pair Type
+  PriorityQueue<int[]> pq = new PriorityQueue<>((a , b) -> b[0] - a[0]);
+
+# Min Heap of Array/Pair Type
+  PriorityQueue<int[]> pq = new PriorityQueue<>((a , b) -> a[0] - b[0]);
+
+# Comparator Trick 
+  (a , b) -> b[0] - a[0]  b is before a then max Heap using 0th index;
+  (a , b) -> a[0] - b[0]  a is before b then min Heap using 0th index;
+
+  
 
 
 
